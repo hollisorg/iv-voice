@@ -45,9 +45,20 @@ export function cleanTranscript(raw, { removeFillers = true, spokenCommands = tr
   return text
 }
 
-// Whisper's initial prompt nudges spelling of names and jargon. Keep it short.
+// Whisper's initial prompt nudges spelling of names and jargon. Whisper only reads about 224
+// tokens of prompt, so include whole terms, newest first, up to a safe length.
+const PROMPT_CHARS = 600
+
 export function vocabularyPrompt(terms) {
-  const words = terms.map((t) => t.trim()).filter(Boolean)
-  if (!words.length) return ''
-  return `Vocabulary: ${words.join(', ')}.`.slice(0, 600)
+  const picked = []
+  let length = 'Vocabulary: .'.length
+  for (const t of [...terms].reverse()) {
+    const term = t.trim()
+    if (!term) continue
+    const add = term.length + (picked.length ? 2 : 0)
+    if (length + add > PROMPT_CHARS) break
+    picked.push(term)
+    length += add
+  }
+  return picked.length ? `Vocabulary: ${picked.reverse().join(', ')}.` : ''
 }
