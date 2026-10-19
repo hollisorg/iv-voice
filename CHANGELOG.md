@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1 (2026-10-19, unsigned test release)
+
+- Fixed: dictation failed to paste with "clipboard.availableFormats is not a function". The paste now
+  uses Electron 44's async clipboard and restores every clipboard format afterwards.
+
 ## 0.1.0 (2026-10-19, unsigned test release)
 
 First version of IV Voice, Infinite Variance voice dictation.
