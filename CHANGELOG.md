@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 (2026-10-19, unsigned test release)
+
+- Local control channel for other apps on this PC: a named pipe (`\\.\pipe\iv-voice-<user>`,
+  newline-delimited JSON) with `toggle`, `start`, `stop`, `cancel`, `paste-last`, `status` and a live
+  `subscribe` feed. Starting from outside goes straight to hands-free. Baby Mode Control's on-screen
+  keyboard uses it for its Voice button.
+
 ## 0.2.2 (2026-10-19, unsigned test release)
 
 - Fixed: Windows showed a blank app icon. The icon is now a classic Windows .ico that Explorer can read.

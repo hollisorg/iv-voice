@@ -55,6 +55,21 @@ sandboxed with context isolation. The only permissions granted are the microphon
 
 History, dictionary and settings are JSON files in `%APPDATA%\IV Voice`. Audio is never saved.
 
+## Control it from other apps
+
+IV Voice listens on a local named pipe, `\\.\pipe\iv-voice-<your Windows username>`. Send one JSON
+object per line:
+
+```
+{"cmd":"toggle"}     start hands-free dictation, or finish the current one
+{"cmd":"start"} {"cmd":"stop"} {"cmd":"cancel"}
+{"cmd":"paste-last"} type the most recent dictation again
+{"cmd":"status"}     -> {"ok":true,"state":"idle|recording|working","locked":false}
+{"cmd":"subscribe"}  keep the connection open; a status line arrives on every change
+```
+
+Code is in `src/main/control.js`. Baby Mode Control's on-screen keyboard uses it for its Voice button.
+
 ## Build the installer
 
 ```bash

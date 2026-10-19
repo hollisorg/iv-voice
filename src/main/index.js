@@ -4,6 +4,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { PROVIDERS, transcribeCloud } from './cloud'
 import { cleanTranscript, vocabularyPrompt } from './cleanup'
+import { startControlServer } from './control'
 import { detectGpu, engineManifest, installedModels, installEngine, installModel, MODELS, modelPath, removeModel, VARIANTS } from './engine'
 import { PushToTalk } from './hotkey'
 import { insertText } from './insert'
@@ -19,6 +20,7 @@ let overlay = null
 let tray = null
 let quitting = false
 let updater = null
+let control = null
 let gpu = null
 const whisper = new WhisperServer()
 const ptt = new PushToTalk()
@@ -207,10 +209,40 @@ let pendingAudio = null
 let limitTimer = null
 const MAX_RECORDING_MS = 10 * 60 * 1000 // hands-free safety stop
 
+let locked = false
+
 function setState(next, extra = {}) {
   state = next
+  locked = next === 'recording' && Boolean(extra.locked)
   sendOverlay('pill:state', { state: next, ...extra })
   sendHub('dictation:state', { state: next, ...extra })
+  control?.notify()
+}
+
+// Commands for other apps on this PC (see control.js). Starting from outside has no key to
+// hold, so it goes straight to hands-free and finishes on the next "stop" or "toggle".
+const remote = {
+  start() {
+    if (state !== 'idle') return
+    onStart()
+    setState('recording', { locked: true, finishHint: 'Click Voice again to finish' })
+  },
+  stop: () => onStop(),
+  cancel: () => onCancel(),
+  toggle() {
+    if (state === 'idle') remote.start()
+    else if (state === 'recording') onStop()
+  },
+  async 'paste-last'() {
+    const last = store.history[0]
+    if (!last) throw new Error('Nothing dictated yet')
+    ptt.setPaused(true)
+    try {
+      await insertText(last.text, { restore: store.settings.restoreClipboard })
+    } finally {
+      ptt.setPaused(false)
+    }
+  }
 }
 
 function hidePillSoon(ms) {
@@ -401,6 +433,7 @@ app.whenReady().then(async () => {
   createTray()
   createHub(!process.argv.includes('--hidden'))
   updater = initUpdater((s) => sendHub('update:changed', s))
+  control = startControlServer({ status: () => ({ state, locked }), commands: remote })
 
   ptt.setCombo(store.settings.hotkey)
   ptt.on('start', onStart)
@@ -422,6 +455,7 @@ app.whenReady().then(async () => {
 
 app.on('before-quit', () => {
   quitting = true
+  control?.close()
   ptt.stop()
   whisper.stop()
 })
