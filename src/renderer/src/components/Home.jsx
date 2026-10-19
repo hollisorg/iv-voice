@@ -27,6 +27,10 @@ export default function Home({ settings, hotkeys, engine, refreshEngine, history
       </h1>
       <p className="lede">
         Hold <kbd>{combo}</kbd>, speak, let go. Your words appear wherever you’re typing.
+        <span className="lede-small">
+          Long thought? Tap <kbd>{settings.hotkey === 'ctrl-shift-space' ? 'Enter' : 'Space'}</kbd> while holding to go
+          hands-free, then press <kbd>{combo}</kbd> again to finish.
+        </span>
       </p>
 
       {!ready && <Setup engine={engine} settings={settings} onDone={refreshEngine} setSettings={setSettings} go={go} />}

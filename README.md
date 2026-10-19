@@ -32,7 +32,9 @@ digest and the model against Hugging Face's LFS SHA-256. They're stored in
 
 1. **Shortcut** (`src/main/hotkey.js`): a low-level keyboard hook (uiohook-napi), because
    Electron's global shortcuts have no key-up event. Holding the combo records and releasing it
-   finishes. Pressing any other key while holding cancels, so shortcuts like Ctrl+Win+D still work.
+   finishes. Tap Space while holding to lock into hands-free mode, then press the combo again to
+   finish (Esc cancels). Pressing any other key while holding cancels, so shortcuts like Ctrl+Win+D
+   still work.
 2. **Microphone** (`src/renderer/src/recorder.js`, inside the floating pill window): 16 kHz mono
    capture, live waveform, encoded as WAV. Near-silent or very short clips are dropped, because
    Whisper invents text from silence.
@@ -64,8 +66,8 @@ auto-updates work the same way as IV Downloader; see `docs/RELEASING.md` and `do
 
 ## Known limits (v0.1)
 
-- The first ~200 ms after pressing the shortcut is lost while the microphone opens. Start
-  speaking a beat after pressing.
+- With Instant start turned off, the first ~0.1–0.2 s after pressing is lost while the microphone
+  opens.
 - Apps running as administrator don't accept simulated input from a normal app, so pasting into
   them fails. Windows blocks this on purpose.
 - Windows only for now.

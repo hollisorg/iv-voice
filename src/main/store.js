@@ -40,6 +40,7 @@ const DEFAULTS = {
   spokenCommands: true,
   restoreClipboard: true,
   sounds: true,
+  instantStart: true, // keep the mic open with a 300 ms rolling buffer so first words aren't lost
   launchAtLogin: false,
   cloud: { provider: 'groq', baseUrl: '', model: '' }
 }
@@ -70,7 +71,7 @@ export class Store {
     pick('language', (v) => typeof v === 'string' && /^(auto|[a-z]{2,3})$/.test(v))
     pick('hotkey', (v) => v in HOTKEYS)
     pick('micId', (v) => typeof v === 'string' && v.length < 300)
-    for (const k of ['removeFillers', 'spokenCommands', 'restoreClipboard', 'sounds', 'launchAtLogin']) {
+    for (const k of ['removeFillers', 'spokenCommands', 'restoreClipboard', 'sounds', 'instantStart', 'launchAtLogin']) {
       pick(k, (v) => typeof v === 'boolean')
     }
     if (patch.cloud && typeof patch.cloud === 'object') {

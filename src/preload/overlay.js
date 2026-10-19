@@ -11,5 +11,6 @@ contextBridge.exposeInMainWorld('pill', {
   onStop: on('record:stop'),
   onCancel: on('record:cancel'),
   onState: on('pill:state'),
+  onMicConfig: on('mic:config'),
   sendAudio: (payload) => ipcRenderer.send('record:audio', payload)
 })

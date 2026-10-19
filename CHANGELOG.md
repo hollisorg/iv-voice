@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.0 (2026-10-19, unsigned test release)
+
+- Instant start: the microphone stays ready with a 0.3 s rolling buffer, so recording begins the
+  moment you press the shortcut and your first word isn't clipped. It pauses while the PC is locked
+  or asleep, and you can turn it off in Settings.
+- Hands-free mode: tap Space while holding the shortcut to lock recording, let go and keep talking,
+  then press the shortcut again to finish (Esc cancels). With Ctrl + Shift + Space, lock with Enter.
+- The pill shows a lock and how to finish while hands-free; a distinct sound plays when it locks.
+- Recordings stop automatically after 10 minutes.
+- Dictionary hints keep whole words, newest first, within Whisper's prompt limit (helps big
+  imported dictionaries).
+
 ## 0.1.1 (2026-10-19, unsigned test release)
 
 - Fixed: dictation failed to paste with "clipboard.availableFormats is not a function". The paste now

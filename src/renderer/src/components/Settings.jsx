@@ -62,7 +62,10 @@ export default function Settings({ settings, saveSettings, setSettings, hotkeys,
       <p className="mono label">05 / Settings</p>
       <h1 className="page-title">Make it yours.</h1>
 
-      <Group title="Talk" note="Hold the shortcut to record, let go to type. Pressing any other key while holding cancels, so normal shortcuts keep working.">
+      <Group
+        title="Talk"
+        note={`Hold the shortcut to record, let go to type. For longer dictation, tap ${s.hotkey === 'ctrl-shift-space' ? 'Enter' : 'Space'} while holding to go hands-free; press the shortcut again to finish, or Esc to cancel. Pressing any other key while holding cancels, so normal shortcuts keep working.`}
+      >
         <Row label="Shortcut">
           <select value={s.hotkey} onChange={(e) => saveSettings({ hotkey: e.target.value })}>
             {Object.entries(hotkeys).map(([id, label]) => (
@@ -94,6 +97,16 @@ export default function Settings({ settings, saveSettings, setSettings, hotkeys,
           </select>
         </Row>
         <Toggle label="Start and stop sounds" checked={s.sounds} onChange={(v) => saveSettings({ sounds: v })} />
+        <Toggle
+          label="Instant start (keep the microphone ready)"
+          checked={s.instantStart}
+          onChange={(v) => saveSettings({ instantStart: v })}
+        />
+        <p className="dim small">
+          Opening a microphone takes about 0.2 s, which can clip your first word. With instant start, IV Voice keeps the
+          mic open and holds only the last 0.3 s in memory, so recording starts the moment you press. Windows will show
+          the microphone as in use. It pauses while your PC is locked or asleep.
+        </p>
       </Group>
 
       <Group title="Speech engine" note="Local keeps your voice on this PC. Cloud sends audio to the provider you choose and is faster on PCs without a GPU.">

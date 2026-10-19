@@ -188,7 +188,13 @@ kbd {
   margin: 20px 0 34px;
   font-size: 18px;
   color: var(--paper-dim);
-  max-width: 40ch;
+  max-width: 44ch;
+}
+
+.lede-small {
+  display: block;
+  margin-top: 10px;
+  font-size: 14.5px;
 }
 
 .notice {

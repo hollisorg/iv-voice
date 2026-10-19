@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Menu, nativeImage, screen, session, shell, Tray } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu, nativeImage, powerMonitor, screen, session, shell, Tray } from 'electron'
 import { randomUUID } from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -118,7 +118,14 @@ function createOverlay() {
   overlay.setAlwaysOnTop(true, 'screen-saver')
   overlay.setIgnoreMouseEvents(true)
   lockDown(overlay)
+  overlay.webContents.on('did-finish-load', sendMicConfig)
   load(overlay, 'overlay.html')
+}
+
+// Instant start keeps the mic open, except while the PC is locked or asleep.
+let screenLocked = false
+function sendMicConfig() {
+  sendOverlay('mic:config', { warm: store.settings.instantStart && !screenLocked, micId: store.settings.micId })
 }
 
 function showPill() {
@@ -197,6 +204,8 @@ function setupEngine({ variant, model }) {
 
 let state = 'idle' // idle | recording | working
 let pendingAudio = null
+let limitTimer = null
+const MAX_RECORDING_MS = 10 * 60 * 1000 // hands-free safety stop
 
 function setState(next, extra = {}) {
   state = next
@@ -215,9 +224,18 @@ function onStart() {
   showPill()
   setState('recording')
   sendOverlay('record:start', { micId: store.settings.micId, sounds: store.settings.sounds })
+  clearTimeout(limitTimer)
+  limitTimer = setTimeout(() => ptt.release(), MAX_RECORDING_MS)
+}
+
+function onLock() {
+  if (state !== 'recording') return
+  const combo = HOTKEYS[store.settings.hotkey] || 'Ctrl + Win'
+  setState('recording', { locked: true, finishHint: `${combo} to finish` })
 }
 
 function onStop() {
+  clearTimeout(limitTimer)
   if (state !== 'recording') return
   setState('working')
   pendingAudio = new Promise((resolve) => {
@@ -235,6 +253,7 @@ function onStop() {
 }
 
 function onCancel() {
+  clearTimeout(limitTimer)
   if (state !== 'recording') return
   sendOverlay('record:cancel')
   setState('idle')
@@ -312,6 +331,7 @@ function registerIpc() {
     if (before.launchAtLogin !== next.launchAtLogin) {
       app.setLoginItemSettings({ openAtLogin: next.launchAtLogin, args: ['--hidden'] })
     }
+    if (before.instantStart !== next.instantStart || before.micId !== next.micId) sendMicConfig()
     configureWhisper()
     return next
   })
@@ -385,9 +405,19 @@ app.whenReady().then(async () => {
   ptt.setCombo(store.settings.hotkey)
   ptt.on('start', onStart)
   ptt.on('stop', onStop)
+  ptt.on('lock', onLock)
   ptt.on('cancel', onCancel)
   ptt.start()
   configureWhisper()
+
+  const setLocked = (locked) => {
+    screenLocked = locked
+    sendMicConfig()
+  }
+  powerMonitor.on('lock-screen', () => setLocked(true))
+  powerMonitor.on('suspend', () => setLocked(true))
+  powerMonitor.on('unlock-screen', () => setLocked(false))
+  powerMonitor.on('resume', () => setLocked(false))
 })
 
 app.on('before-quit', () => {
