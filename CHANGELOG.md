@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1 (2026-10-19, unsigned test release)
+
+- New Infinite Variance app, tray and installer icon.
+
 ## 0.2.0 (2026-10-19, unsigned test release)
 
 - Instant start: the microphone stays ready with a 0.3 s rolling buffer, so recording begins the
