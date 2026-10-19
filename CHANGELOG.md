@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2 (2026-10-19, unsigned test release)
+
+- Fixed: Windows showed a blank app icon. The icon is now a classic Windows .ico that Explorer can read.
+
 ## 0.2.1 (2026-10-19, unsigned test release)
 
 - New Infinite Variance app, tray and installer icon.
