@@ -1,0 +1,88 @@
+# Builds, signs and uploads the Windows installer when a version tag is pushed (e.g. v0.2.0).
+# The result is a DRAFT GitHub release: review it, then click Publish. Installed apps only see
+# published releases, so nothing reaches users until then.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Tag matches package.json version
+        shell: bash
+        run: |
+          expected="v$(node -p "require('./package.json').version")"
+          if [ "$GITHUB_REF_NAME" != "$expected" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $expected"
+            exit 1
+          fi
+
+      - run: npx electron-vite build
+
+      # electron-builder uploads files in parallel; if no release exists yet, each upload can create
+      # its own draft. Create the one draft first so every file lands in it.
+      - name: Create the draft release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          existing=$(gh api "repos/$GITHUB_REPOSITORY/releases" -q ".[] | select(.tag_name == \"$GITHUB_REF_NAME\") | .id")
+          if [ -z "$existing" ]; then
+            gh release create "$GITHUB_REF_NAME" --draft --title "${GITHUB_REF_NAME#v}" --notes "See CHANGELOG.md for what changed."
+          else
+            echo "Release for $GITHUB_REF_NAME already exists ($existing)"
+          fi
+
+      - name: Build, sign and upload installer
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Azure Artifact Signing (formerly Trusted Signing). See docs/CODE-SIGNING.md.
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          SIGN_ENDPOINT: ${{ vars.AZURE_SIGNING_ENDPOINT }}
+          SIGN_ACCOUNT: ${{ vars.AZURE_SIGNING_ACCOUNT }}
+          SIGN_PROFILE: ${{ vars.AZURE_CERTIFICATE_PROFILE }}
+          SIGN_PUBLISHER: ${{ vars.AZURE_PUBLISHER_NAME }}
+          ALLOW_UNSIGNED: ${{ vars.ALLOW_UNSIGNED }}
+        run: |
+          args=(--win --x64 --publish always)
+          if [ -n "$SIGN_ENDPOINT" ] && [ -n "$AZURE_CLIENT_SECRET" ]; then
+            args+=(
+              "-c.win.azureSignOptions.endpoint=$SIGN_ENDPOINT"
+              "-c.win.azureSignOptions.codeSigningAccountName=$SIGN_ACCOUNT"
+              "-c.win.azureSignOptions.certificateProfileName=$SIGN_PROFILE"
+              "-c.win.azureSignOptions.publisherName=$SIGN_PUBLISHER"
+            )
+          elif [ "$ALLOW_UNSIGNED" = "true" ]; then
+            echo "::warning::Code signing is not configured; uploading an UNSIGNED build (ALLOW_UNSIGNED=true)."
+          else
+            echo "::error::Code signing is not configured. Set it up (docs/CODE-SIGNING.md) or set the repository variable ALLOW_UNSIGNED=true."
+            exit 1
+          fi
+          npx electron-builder "${args[@]}"
+
+      - name: Report installer signature
+        shell: pwsh
+        run: |
+          $sig = Get-AuthenticodeSignature dist/IV-Voice-Setup.exe
+          "Signature: $($sig.Status)  Signer: $($sig.SignerCertificate.Subject)"
+          if ($env:ALLOW_UNSIGNED -ne 'true' -and $sig.Status -ne 'Valid') { throw 'Installer is not validly signed' }
+        env:
+          ALLOW_UNSIGNED: ${{ vars.ALLOW_UNSIGNED }}

@@ -1,0 +1,35 @@
+# Every push and pull request: install, build, and package (without an installer or upload).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npx electron-vite build
+      - run: npx electron-builder --win --x64 --dir --publish never
+
+      - name: Bundled tools are unpacked
+        shell: pwsh
+        run: |
+          $r = 'dist/win-unpacked/resources'
+          foreach ($f in "$r/app.asar.unpacked/node_modules/uiohook-napi/prebuilds/win32-x64/uiohook-napi.node",
+                         "$r/THIRD_PARTY_NOTICES.txt") {
+            if (-not (Test-Path $f)) { throw "Missing $f" }
+          }
+          'Packaged app contains the keyboard hook and notices.'

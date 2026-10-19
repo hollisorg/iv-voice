@@ -1,0 +1,37 @@
+IV Voice
+(c) 2026 Infinite Variance. Released under the MIT licence:
+https://github.com/hollisorg/iv-voice
+
+IV Voice is built from the open-source software listed below. Full licence texts are in the
+"licenses" folder next to this file.
+
+------------------------------------------------------------------------------------
+uiohook-napi and libuiohook (global keyboard hook for the push-to-talk shortcut)
+  uiohook-napi: MIT. licenses/uiohook-napi-MIT.txt
+  libuiohook (compiled into uiohook-napi.node): GNU Lesser General Public License v3 or later.
+    licenses/LGPL-3.0.txt and licenses/GPL-3.0.txt
+  Source code: https://github.com/SnosMe/uiohook-napi and https://github.com/kwhat/libuiohook
+  The library ships as a separate, replaceable file:
+    resources/app.asar.unpacked/node_modules/uiohook-napi/prebuilds/win32-x64/uiohook-napi.node
+
+whisper.cpp (speech engine)
+  Licence: MIT. https://github.com/ggml-org/whisper.cpp
+  Not included in the installer. Downloaded on first use from the official release and verified
+  against GitHub's published SHA-256 digest. The CUDA build includes NVIDIA CUDA runtime
+  libraries under NVIDIA's own redistribution terms.
+
+Whisper models (ggml format)
+  Licence: MIT (OpenAI Whisper). https://github.com/openai/whisper
+  Not included in the installer. Downloaded on first use from
+  https://huggingface.co/ggerganov/whisper.cpp and verified against its published SHA-256.
+
+Electron 44 and Chromium
+  Licence: MIT (Electron) and the Chromium licences
+  Licence text: LICENSE.electron.txt and LICENSES.chromium.html in the install folder
+
+React and React DOM 19
+  Licence: MIT. licenses/React-MIT.txt
+
+Fonts: Barlow, DM Sans, JetBrains Mono
+  Licence: SIL Open Font License 1.1
+  licenses/Barlow-OFL.txt, licenses/DMSans-OFL.txt, licenses/JetBrainsMono-OFL.txt

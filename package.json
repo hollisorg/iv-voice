@@ -1,0 +1,95 @@
+{
+  "name": "iv-voice",
+  "productName": "IV Voice",
+  "version": "0.1.0",
+  "description": "Infinite Variance voice dictation: hold a key, speak, and clean text appears where you type.",
+  "author": "Infinite Variance",
+  "license": "MIT",
+  "homepage": "https://infinitevariance.ai",
+  "private": true,
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview",
+    "dist": "electron-vite build && electron-builder --win --x64 --publish never",
+    "release": "electron-vite build && electron-builder --win --x64 --publish always"
+  },
+  "dependencies": {
+    "electron-updater": "6.8.9",
+    "uiohook-napi": "1.5.5"
+  },
+  "devDependencies": {
+    "@fontsource/barlow": "5.3.0",
+    "@fontsource/dm-sans": "5.3.0",
+    "@fontsource/jetbrains-mono": "5.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "electron": "44.9.0",
+    "electron-builder": "26.15.3",
+    "electron-vite": "6.0.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "vite": "8.3.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hollisorg/iv-voice.git"
+  },
+  "build": {
+    "appId": "ai.infinitevariance.voice",
+    "productName": "IV Voice",
+    "copyright": "© 2026 Infinite Variance",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "out/**/*",
+      "resources/**/*",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "node_modules/uiohook-napi/**"
+    ],
+    "extraResources": [
+      {
+        "from": "THIRD_PARTY_NOTICES.txt",
+        "to": "THIRD_PARTY_NOTICES.txt"
+      },
+      {
+        "from": "build/licenses",
+        "to": "licenses"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "IV Voice",
+      "uninstallDisplayName": "IV Voice",
+      "artifactName": "IV-Voice-Setup.exe",
+      "deleteAppDataOnUninstall": false
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "hollisorg",
+        "repo": "iv-voice",
+        "releaseType": "draft"
+      }
+    ]
+  }
+}
