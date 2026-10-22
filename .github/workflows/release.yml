@@ -34,8 +34,8 @@ jobs:
 
       - run: npx electron-vite build
 
-      # electron-builder uploads files in parallel; if no release exists yet, each upload can create
-      # its own draft. Create the one draft first so every file lands in it.
+      # Create the one draft up front. electron-builder only builds; the files are uploaded to this
+      # draft after the signature check (its own publishing could open a second draft).
       - name: Create the draft release
         shell: bash
         env:
@@ -62,7 +62,7 @@ jobs:
           SIGN_PUBLISHER: ${{ vars.AZURE_PUBLISHER_NAME }}
           ALLOW_UNSIGNED: ${{ vars.ALLOW_UNSIGNED }}
         run: |
-          args=(--win --x64 --publish always)
+          args=(--win --x64 --publish never)
           if [ -n "$SIGN_ENDPOINT" ] && [ -n "$AZURE_CLIENT_SECRET" ]; then
             args+=(
               "-c.win.azureSignOptions.endpoint=$SIGN_ENDPOINT"
@@ -86,3 +86,9 @@ jobs:
           if ($env:ALLOW_UNSIGNED -ne 'true' -and $sig.Status -ne 'Valid') { throw 'Installer is not validly signed' }
         env:
           ALLOW_UNSIGNED: ${{ vars.ALLOW_UNSIGNED }}
+
+      - name: Upload to the draft release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "$GITHUB_REF_NAME" dist/IV-Voice-Setup.exe dist/IV-Voice-Setup.exe.blockmap dist/latest.yml --clobber
