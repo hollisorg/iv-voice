@@ -33,7 +33,7 @@ export default function History({ history, setHistory }) {
 
   return (
     <div className="history">
-      <p className="mono label">04 / History</p>
+      <p className="mono label">03 · History</p>
       <div className="history-head">
         <h1 className="page-title">What you said.</h1>
         <div className="history-tools">

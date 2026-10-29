@@ -3,6 +3,7 @@ import Home from './components/Home'
 import Dictionary from './components/Dictionary'
 import History from './components/History'
 import Settings from './components/Settings'
+import mark from './assets/voice-mark.png'
 
 const PAGES = [
   ['home', 'Home'],
@@ -46,7 +47,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="titlebar">
-        <span className="brand-mark">IV</span>
+        <img className="brand-logo" src={mark} alt="" />
         <span className="mono">Infinite Variance</span>
         <span className="mono dim">/ Voice</span>
       </header>
@@ -57,7 +58,7 @@ export default function App() {
             {label}
           </button>
         ))}
-        <div className="nav-foot mono dim">
+        <div className="nav-foot mono">
           {update?.status === 'ready' ? (
             <button className="link-btn mono update-ready" onClick={() => window.iv.app.installUpdate()}>
               Restart to update to v{update.available}
@@ -65,9 +66,13 @@ export default function App() {
           ) : (
             <span>v{update?.version}</span>
           )}
+          <a className="nav-site" href="https://infinitevariance.ai" target="_blank" rel="noreferrer">
+            infinitevariance.ai ↗
+          </a>
         </div>
       </nav>
       <main className="page">
+        <div className="page-art" aria-hidden="true" />
         {page === 'home' && <Home {...ctx} />}
         {page === 'dictionary' && <Dictionary />}
         {page === 'history' && <History {...ctx} />}

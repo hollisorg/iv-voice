@@ -16,7 +16,7 @@ export default function Dictionary() {
 
   return (
     <div className="dictionary">
-      <p className="mono label">03 / Dictionary</p>
+      <p className="mono label">02 · Dictionary</p>
       <h1 className="page-title">Your words.</h1>
 
       <section className="panel">

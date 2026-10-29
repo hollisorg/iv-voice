@@ -1,15 +1,17 @@
-/* Infinite Variance palette + type, from infinitevariance.ai */
+/* Infinite Variance palette and type, matching IV Studio and IV Chat */
 :root {
   --ink: #100c0e;
   --ink-2: #19131a;
   --ink-3: #241b22;
+  --deep: #0b0809;
   --line: rgba(241, 237, 229, 0.12);
   --line-strong: rgba(241, 237, 229, 0.28);
   --paper: #f1ede5;
   --paper-dim: rgba(241, 237, 229, 0.58);
+  --cream: #f4ecdc; /* the "What If?" lettering */
   --pink: #f19dac;
   --red: #f44859;
-  --display: 'Barlow', Impact, sans-serif;
+  --display: 'Barlow Condensed', 'Barlow', Impact, sans-serif;
   --body: 'DM Sans', Arial, sans-serif;
   --mono: 'JetBrains Mono', ui-monospace, monospace;
   color-scheme: dark;
@@ -113,19 +115,40 @@ kbd {
   border-bottom: 1px solid var(--line);
 }
 
-.brand-mark {
-  font: 600 13px/1 var(--display);
-  border: 1px solid var(--paper);
-  padding: 4px 5px 3px;
+.brand-logo {
+  height: 20px;
+  width: auto;
+  display: block;
+  -webkit-user-drag: none;
 }
 
 .nav {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   padding: 22px 12px;
   gap: 2px;
   border-right: 1px solid var(--line);
   background: var(--ink-2);
+}
+
+/* a faint slice of the artwork, like IV Studio's sidebar */
+.nav::before {
+  content: '';
+  position: absolute;
+  left: -40px;
+  right: -40px;
+  bottom: 0;
+  height: 300px;
+  background: url('./assets/voice-art.webp') 30% 62% / auto 540px no-repeat;
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent);
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent);
+  pointer-events: none;
+}
+
+.nav > * {
+  position: relative;
 }
 
 .nav-item {
@@ -136,9 +159,9 @@ kbd {
   background: none;
   border: 0;
   text-align: left;
-  font: 600 20px/1 var(--display);
+  font: 700 23px/1 var(--display);
   text-transform: uppercase;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
   color: var(--paper-dim);
   border-left: 2px solid transparent;
 }
@@ -148,17 +171,34 @@ kbd {
 }
 
 .nav-item.on {
-  color: var(--paper);
+  color: var(--cream);
   border-left-color: var(--red);
 }
 
 .nav-foot {
   margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
   padding: 0 12px;
+  color: var(--cream);
+  text-shadow: 0 1px 6px #000, 0 0 2px #000;
+}
+
+.nav-site {
+  color: var(--cream);
+  text-decoration: none;
+}
+
+.nav-site:hover {
+  color: var(--pink);
 }
 
 .page {
+  position: relative;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: clamp(28px, 4vw, 52px);
 }
 
@@ -166,16 +206,43 @@ kbd {
   max-width: 860px;
 }
 
+.page-art {
+  position: absolute;
+  top: -60px;
+  right: -200px;
+  width: 760px;
+  height: 380px;
+  background: url('./assets/voice-art.webp') center / 100% 100% no-repeat;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, transparent 18%, #000 55%), linear-gradient(to top, transparent 0, #000 55%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent 0, transparent 18%, #000 55%), linear-gradient(to top, transparent 0, #000 55%);
+  mask-composite: intersect;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.page > * {
+  position: relative;
+}
+
+.page > .page-art {
+  position: absolute;
+}
+
 .headline {
-  font: 600 clamp(80px, 10vw, 150px) / 0.84 var(--display);
-  letter-spacing: -0.04em;
+  font: 800 clamp(80px, 10vw, 150px) / 0.82 var(--display);
+  letter-spacing: -0.01em;
+  color: var(--cream);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.6);
   text-transform: uppercase;
   margin: 0;
 }
 
 .page-title {
-  font: 600 clamp(48px, 6vw, 76px) / 0.9 var(--display);
-  letter-spacing: -0.03em;
+  font: 800 clamp(48px, 6vw, 76px) / 0.88 var(--display);
+  letter-spacing: -0.01em;
+  color: var(--cream);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.6);
   text-transform: uppercase;
   margin: 0 0 28px;
 }
@@ -614,7 +681,6 @@ select {
   width: 34px;
   height: 20px;
   border: 1px solid var(--line-strong);
-  border-radius: 10px;
   position: relative;
   transition: background 0.15s, border-color 0.15s;
 }
@@ -626,7 +692,6 @@ select {
   left: 3px;
   width: 12px;
   height: 12px;
-  border-radius: 50%;
   background: var(--paper-dim);
   transition: transform 0.18s, background 0.18s;
 }
@@ -660,5 +725,11 @@ select {
   * {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+@media (max-width: 1000px) {
+  .page-art {
+    opacity: 0.45;
   }
 }

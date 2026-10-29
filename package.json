@@ -16,6 +16,7 @@
     "release": "electron-vite build && electron-builder --win --x64 --publish always"
   },
   "dependencies": {
+    "@fontsource/barlow-condensed": "5.3.0",
     "electron-updater": "6.8.9",
     "uiohook-napi": "1.5.5"
   },

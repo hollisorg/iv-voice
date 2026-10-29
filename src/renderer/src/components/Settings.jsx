@@ -59,7 +59,7 @@ export default function Settings({ settings, saveSettings, setSettings, hotkeys,
 
   return (
     <div className="settings">
-      <p className="mono label">05 / Settings</p>
+      <p className="mono label">04 · Settings</p>
       <h1 className="page-title">Make it yours.</h1>
 
       <Group

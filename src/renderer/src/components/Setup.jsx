@@ -37,7 +37,7 @@ export default function Setup({ engine, settings, onDone, go }) {
 
   return (
     <section className="setup">
-      <p className="mono label">00 / Set up</p>
+      <p className="mono label">00 · Set up</p>
       {settings.engine === 'cloud' ? (
         <>
           <h2>Add your API key.</h2>

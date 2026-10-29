@@ -21,7 +21,7 @@ export default function Home({ settings, hotkeys, engine, refreshEngine, history
 
   return (
     <div className="home">
-      <p className="mono label">01 / The voice</p>
+      <p className="mono label">01 · The voice</p>
       <h1 className="headline">
         Say it<span className="accent">.</span>
       </h1>
@@ -65,7 +65,7 @@ export default function Home({ settings, hotkeys, engine, refreshEngine, history
             </div>
           </div>
 
-          <p className="mono label try-label">02 / Try it</p>
+          <p className="mono label try-label">02 · Try it</p>
           <textarea
             className="tryit"
             placeholder={`Click here, hold ${combo} and talk. Let go and your words land here.`}
