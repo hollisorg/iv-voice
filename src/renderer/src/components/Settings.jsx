@@ -17,7 +17,7 @@ const LANGUAGES = [
 
 const clean = (err) => String(err?.message || err).replace(/^Error invoking remote method '[^']+': (Error: )?/, '')
 
-export default function Settings({ settings, saveSettings, setSettings, hotkeys, engine, setEngine, refreshEngine }) {
+export default function Settings({ settings, saveSettings, setSettings, hotkeys, engine, setEngine, refreshEngine, update, setUpdate }) {
   const [mics, setMics] = useState([])
   const [key, setKey] = useState('')
   const [busy, setBusy] = useState(null)
@@ -275,9 +275,43 @@ export default function Settings({ settings, saveSettings, setSettings, hotkeys,
         <Toggle label="Start IV Voice when I sign in to Windows" checked={s.launchAtLogin} onChange={(v) => saveSettings({ launchAtLogin: v })} />
         <p className="dim small">Closing the window keeps IV Voice running in the tray, so the shortcut always works.</p>
       </Group>
+
+      <Updates update={update} setUpdate={setUpdate} />
     </div>
   )
 
+}
+
+const UPDATE_WORDS = {
+  dev: 'Updates work in the installed app.',
+  idle: 'IV Voice checks for a new version when it opens and every few hours.',
+  checking: 'Checking for a new version…',
+  current: 'You have the newest version.',
+  downloading: 'Downloading the new version in the background…',
+  ready: 'The new version is downloaded. Restart to use it, or it installs when you quit IV Voice.'
+}
+
+// New versions download by themselves from IV Voice's public GitHub releases; this shows where that stands.
+function Updates({ update, setUpdate }) {
+  const u = update || { status: 'idle' }
+  const busy = u.status === 'checking' || u.status === 'downloading'
+  const words = u.status === 'error' ? u.error || 'Couldn’t check for updates.' : u.status === 'downloading' && u.available ? `Downloading version ${u.available}${u.percent ? ` (${Math.round(u.percent)}%)` : ''}…` : u.status === 'ready' ? `Version ${u.available} is downloaded. Restart to use it, or it installs when you quit IV Voice.` : UPDATE_WORDS[u.status] || UPDATE_WORDS.idle
+  return (
+    <Group title="Updates" note="IV Voice updates itself from its public releases on GitHub. No account needed.">
+      <p className="mono">Version {u.version || '…'}</p>
+      <p className="dim small" role="status">{words}</p>
+      <div className="update-row">
+        {u.status === 'ready' ? (
+          <button className="btn btn-small" onClick={() => window.iv.app.installUpdate()}>Restart to update</button>
+        ) : (
+          <button className="btn btn-small" disabled={busy || u.status === 'dev'} onClick={async () => setUpdate(await window.iv.app.checkUpdate())}>
+            {u.status === 'checking' ? 'Checking…' : 'Check for updates'}
+          </button>
+        )}
+      </div>
+      {u.checkedAt && <p className="dim small">Last checked {new Date(u.checkedAt).toLocaleString()}</p>}
+    </Group>
+  )
 }
 
 // Defined at module level so inputs inside keep focus across re-renders.

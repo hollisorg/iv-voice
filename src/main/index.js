@@ -395,6 +395,7 @@ function registerIpc() {
 
   ipcMain.handle('update:state', () => updateState())
   ipcMain.handle('update:install', () => updater?.install())
+  ipcMain.handle('update:check', () => updater?.check())
 
   // Development only: run the pipeline on a WAV file from disk.
   if (!app.isPackaged) {

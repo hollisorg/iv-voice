@@ -29,18 +29,20 @@ export function initUpdater(onChange) {
   autoUpdater.autoInstallOnAppQuit = true
 
   autoUpdater.on('checking-for-update', () => set({ status: 'checking', error: null }))
-  autoUpdater.on('update-not-available', () => set({ status: 'current', available: null }))
+  autoUpdater.on('update-not-available', () => set({ status: 'current', available: null, checkedAt: new Date().toISOString() }))
   autoUpdater.on('update-available', (info) => set({ status: 'downloading', available: info.version, percent: 0 }))
   autoUpdater.on('download-progress', (p) => set({ status: 'downloading', percent: p.percent }))
   autoUpdater.on('update-downloaded', (info) => set({ status: 'ready', available: info.version, percent: 100 }))
   autoUpdater.on('error', (err) => {
     const message = String(err?.message || err)
     // Before the first release is published (drafts only), GitHub has no "latest" to report.
-    if (/Unable to find latest version/i.test(message)) return set({ status: 'current', error: null })
+    if (/Unable to find latest version|No published versions/i.test(message)) return set({ status: 'current', error: null, checkedAt: new Date().toISOString() })
+    if (/ENOTFOUND|ECONNREFUSED|ETIMEDOUT|net::ERR_/i.test(message)) return set({ status: 'error', error: 'Couldn’t reach GitHub. It tries again later by itself.' })
     set({ status: 'error', error: message.split('\n')[0] })
   })
 
   const check = async () => {
+    if (state.status === 'downloading' || state.status === 'ready') return state
     try {
       await autoUpdater.checkForUpdates()
     } catch {
@@ -55,6 +57,6 @@ export function initUpdater(onChange) {
   return {
     check,
     // The download queue is saved first, so anything in progress resumes after the restart.
-    install: () => autoUpdater.quitAndInstall(false, true)
+    install: () => { if (state.status === 'ready') autoUpdater.quitAndInstall(false, true) }
   }
 }

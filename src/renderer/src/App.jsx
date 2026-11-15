@@ -42,7 +42,7 @@ export default function App() {
 
   if (!settings) return null
 
-  const ctx = { settings, saveSettings, setSettings, hotkeys, engine, setEngine, refreshEngine, history, setHistory, go: setPage }
+  const ctx = { settings, saveSettings, setSettings, hotkeys, engine, setEngine, refreshEngine, history, setHistory, go: setPage, update, setUpdate }
 
   return (
     <div className="app">

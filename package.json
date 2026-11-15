@@ -1,7 +1,7 @@
 {
   "name": "iv-voice",
   "productName": "IV Voice",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Infinite Variance voice dictation: hold a key, speak, and clean text appears where you type.",
   "author": "Infinite Variance",
   "license": "MIT",
@@ -89,7 +89,7 @@
         "provider": "github",
         "owner": "hollisorg",
         "repo": "iv-voice",
-        "releaseType": "draft"
+        "releaseType": "release"
       }
     ]
   }

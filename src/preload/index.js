@@ -41,6 +41,7 @@ contextBridge.exposeInMainWorld('iv', {
   app: {
     update: () => ipcRenderer.invoke('update:state'),
     installUpdate: () => ipcRenderer.invoke('update:install'),
+    checkUpdate: () => ipcRenderer.invoke('update:check'),
     onUpdate: on('update:changed')
   }
 })

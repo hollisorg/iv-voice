@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0 (2026-11-15, unsigned)
+
+- Settings has an Updates section: the version, where an update stands, Check for updates and Restart to update.
+  IV Voice still checks by itself when it opens and every six hours, and installs a downloaded update when you quit.
+- The look and icon of the other IV apps (from the earlier restyle).
+- Releases are published (not drafts), so every copy updates from github.com/hollisorg/iv-voice.
+
 ## 0.3.0 (2026-10-19, unsigned test release)
 
 - Local control channel for other apps on this PC: a named pipe (`\\.\pipe\iv-voice-<user>`,
