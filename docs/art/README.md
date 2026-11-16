@@ -4,9 +4,9 @@ IV Voice matches IV Studio and IV Chat. IV Studio uses the red liquid "What If?"
 
 ## How it was made (2026-10-29)
 
-- The same free local pipeline as IV Chat (see `iv-chat/docs/art/README.md`): ComfyUI on Matthew's RTX 4090, Flux.2 Klein 9B, `qwen_3_8b` text encoder, `flux2-vae`, 4 steps, euler, 1536 × 768.
+- The same free local pipeline as IV Chat (see `iv-chat/docs/art/README.md`): ComfyUI on an RTX 4090, Flux.2 Klein 9B, `qwen_3_8b` text encoder, `flux2-vae`, 4 steps, euler, 1536 × 768.
 - Style reference: IV Studio's eye art (`iv-chat-style-ref.png` in ComfyUI's input folder), passed in as a reference latent.
-- Prompt: `prompt.txt`. Seeds 101, 202 and 303 were rendered; 101 was picked for the largest, clearest centre object. Raw outputs are in `F:\ComfyUI\ComfyUI\output\IV-Apps\`.
+- Prompt: `prompt.txt`. Seeds 101, 202 and 303 were rendered; 101 was picked for the largest, clearest centre object. Raw outputs are in ComfyUI's `output\IV-Apps\`.
 
 ## Files
 
