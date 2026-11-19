@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import NewsletterBox from './NewsletterBox'
 
 const LANGUAGES = [
   ['en', 'English'],
@@ -274,6 +275,10 @@ export default function Settings({ settings, saveSettings, setSettings, hotkeys,
       <Group title="App">
         <Toggle label="Start IV Voice when I sign in to Windows" checked={s.launchAtLogin} onChange={(v) => saveSettings({ launchAtLogin: v })} />
         <p className="dim small">Closing the window keeps IV Voice running in the tray, so the shortcut always works.</p>
+      </Group>
+
+      <Group title="The IV Newsletter">
+        <NewsletterBox api={window.iv.newsletter} title={false} />
       </Group>
 
       <Updates update={update} setUpdate={setUpdate} />

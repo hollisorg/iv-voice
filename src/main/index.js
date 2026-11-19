@@ -1,3 +1,4 @@
+import { createNewsletter, fileStore, registerNewsletter } from './newsletter'
 import { app, BrowserWindow, ipcMain, Menu, nativeImage, powerMonitor, screen, session, shell, Tray } from 'electron'
 import { randomUUID } from 'node:crypto'
 import fs from 'node:fs'
@@ -355,6 +356,9 @@ async function finishDictation({ wav, durationMs, peak, error }) {
 // ---------- IPC ----------
 
 function registerIpc() {
+  // The IV Newsletter (src/main/newsletter.js, shared by every IV app): sends only an address typed and joined,
+  // keeps only the join date. IV_NEWSLETTER_URL points a test copy at a local stand-in.
+  registerNewsletter(ipcMain, shell, createNewsletter({ app: 'iv-voice', version: app.getVersion(), store: fileStore(path.join(app.getPath('userData'), 'newsletter.json')) }))
   ipcMain.handle('settings:get', () => ({ settings: store.publicSettings(), hotkeys: HOTKEYS }))
   ipcMain.handle('settings:set', (_e, patch) => {
     const before = store.settings
