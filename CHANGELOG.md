@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0 (2026-11-19)
+
+- **Join The IV Newsletter.** Settings has a box to join The IV Newsletter: one email a week from Matt about
+  what's new in the IV apps, how things are made, and free tools. It's opt-in: nothing is sent until you type
+  your email and press Join. Kit, our email service, sends a confirm email first, and you can unsubscribe any
+  time. IV Voice doesn't keep your address, and your settings, dictionary and history are left exactly as they are.
+
 ## 0.4.0 (2026-11-15, unsigned)
 
 - Settings has an Updates section: the version, where an update stands, Check for updates and Restart to update.
