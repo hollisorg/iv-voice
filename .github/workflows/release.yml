@@ -12,6 +12,10 @@ permissions:
 
 jobs:
   windows:
+    environment: windows-signing
+    permissions:
+      contents: write
+      id-token: write
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v5
@@ -32,8 +36,6 @@ jobs:
             exit 1
           fi
 
-      - run: npx electron-vite build
-
       # Create the one draft up front. electron-builder only builds; the files are uploaded to this
       # draft after the signature check (its own publishing could open a second draft).
       - name: Create the draft release
@@ -48,44 +50,21 @@ jobs:
             echo "Release for $GITHUB_REF_NAME already exists ($existing)"
           fi
 
-      - name: Build, sign and upload installer
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Azure Artifact Signing (formerly Trusted Signing). See docs/CODE-SIGNING.md.
-          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          SIGN_ENDPOINT: ${{ vars.AZURE_SIGNING_ENDPOINT }}
-          SIGN_ACCOUNT: ${{ vars.AZURE_SIGNING_ACCOUNT }}
-          SIGN_PROFILE: ${{ vars.AZURE_CERTIFICATE_PROFILE }}
-          SIGN_PUBLISHER: ${{ vars.AZURE_PUBLISHER_NAME }}
-          ALLOW_UNSIGNED: ${{ vars.ALLOW_UNSIGNED }}
-        run: |
-          args=(--win --x64 --publish never)
-          if [ -n "$SIGN_ENDPOINT" ] && [ -n "$AZURE_CLIENT_SECRET" ]; then
-            args+=(
-              "-c.win.azureSignOptions.endpoint=$SIGN_ENDPOINT"
-              "-c.win.azureSignOptions.codeSigningAccountName=$SIGN_ACCOUNT"
-              "-c.win.azureSignOptions.certificateProfileName=$SIGN_PROFILE"
-              "-c.win.azureSignOptions.publisherName=$SIGN_PUBLISHER"
-            )
-          elif [ "$ALLOW_UNSIGNED" = "true" ]; then
-            echo "::warning::Code signing is not configured; uploading an UNSIGNED build (ALLOW_UNSIGNED=true)."
-          else
-            echo "::error::Code signing is not configured. Set it up (docs/CODE-SIGNING.md) or set the repository variable ALLOW_UNSIGNED=true."
-            exit 1
-          fi
-          npx electron-builder "${args[@]}"
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          dotnet-version: '10.0.x'
 
-      - name: Report installer signature
-        shell: pwsh
-        run: |
-          $sig = Get-AuthenticodeSignature dist/IV-Voice-Setup.exe
-          "Signature: $($sig.Status)  Signer: $($sig.SignerCertificate.Subject)"
-          if ($env:ALLOW_UNSIGNED -ne 'true' -and $sig.Status -ne 'Valid') { throw 'Installer is not validly signed' }
+      - name: Sign in to Azure using GitHub OIDC
+        uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3
         env:
-          ALLOW_UNSIGNED: ${{ vars.ALLOW_UNSIGNED }}
+          AZURE_CORE_OUTPUT: none
+        with:
+          client-id: ${{ vars.IV_SIGNING_AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.IV_SIGNING_AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: Build and verify signed Windows release
+        run: npm run dist:win-release
 
       - name: Upload to the draft release
         shell: bash
