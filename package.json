@@ -13,7 +13,8 @@
     "build": "electron-vite build",
     "start": "electron-vite preview",
     "dist": "electron-vite build && electron-builder --win --x64 --publish never",
-    "release": "electron-vite build && electron-builder --win --x64 --publish always"
+    "dist:win-release": "node scripts/windows-release.cjs",
+    "release": "node scripts/windows-release.cjs --publish"
   },
   "dependencies": {
     "@fontsource/barlow-condensed": "5.3.0",
